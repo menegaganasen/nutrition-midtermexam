@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nutrition &amp; Health Exam</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;color:#1a1a1a;background:#f5f5f3;font-size:15px;min-height:100vh}
+.wrap{max-width:700px;margin:0 auto;padding:1.5rem 1rem 4rem}
+.screen{display:none}.screen.active{display:block}
+h1{font-size:22px;font-weight:600;margin-bottom:4px}
+h2{font-size:18px;font-weight:600;margin-bottom:1rem}
+h3{font-size:15px;font-weight:600;margin-bottom:.5rem}
+p.sub{color:#666;font-size:14px;margin-bottom:1rem;line-height:1.6}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:8px;border:1px solid #d0d0cc;background:#fff;color:#1a1a1a;font-size:14px;cursor:pointer;transition:background .15s;font-family:inherit;font-weight:500}
+.btn:hover{background:#f0f0ee}
+.btn.primary{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.btn.primary:hover{background:#333}
+.btn.green{background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7}
+.btn.green:hover{background:#d4edda}
+input[type=text],input[type=number],input[type=password],textarea{width:100%;padding:9px 11px;border:1px solid #d0d0cc;border-radius:8px;background:#fff;color:#1a1a1a;font-family:inherit;font-size:14px;outline:none;transition:border-color .15s}
+input[type=text]:focus,input[type=number]:focus,input[type=password]:focus,textarea:focus{border-color:#888}
+textarea{resize:vertical;min-height:100px;line-height:1.6}
+.card{background:#fff;border:1px solid #e8e8e4;border-radius:12px;padding:1.1rem 1.25rem;margin-bottom:1rem}
+.label{font-size:12px;color:#888;margin-bottom:4px;display:block;font-weight:500}
+.badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.badge.mcq{background:#e8f0fe;color:#1a56db}
+.badge.essay{background:#e8f5e9;color:#2e7d32}
+.divider{border:none;border-top:1px solid #e8e8e4;margin:1rem 0}
+.q-num{width:28px;height:28px;border-radius:50%;background:#f0f0ee;border:1px solid #e0e0dc;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+.mcq-option{display:flex;align-items:center;gap:10px;padding:9px 13px;border:1px solid #e8e8e4;border-radius:8px;margin-bottom:7px;cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
+.mcq-option:hover{border-color:#999;background:#fafafa}
+.mcq-option.selected{border-color:#1a56db;background:#e8f0fe}
+.mcq-option.selected .opt-letter{color:#1a56db}
+.progress-bar{height:5px;background:#e8e8e4;border-radius:999px;margin-bottom:1rem;overflow:hidden}
+.progress-fill{height:100%;background:#1a1a1a;border-radius:999px;transition:width .3s}
+.timer-box{display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:8px;border:1px solid #e0e0dc;background:#f5f5f3;font-size:14px;font-weight:600;font-family:monospace}
+.timer-box.warn{border-color:#f59e0b;background:#fffbeb;color:#92400e}
+.timer-box.danger{border-color:#ef4444;background:#fef2f2;color:#991b1b}
+.metric{background:#f5f5f3;border-radius:8px;padding:.85rem 1rem;text-align:center}
+.metric .val{font-size:22px;font-weight:700;display:block;margin-top:2px}
+.metric .lbl{font-size:12px;color:#888}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:1.25rem}
+.flex-end{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.flex-between{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.section-hd{font-size:13px;font-weight:600;color:#888;margin:1.5rem 0 .75rem;padding-bottom:5px;border-bottom:1px solid #e8e8e4;letter-spacing:.03em;text-transform:uppercase}
+.dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.dot.c{background:#22c55e}.dot.w{background:#ef4444}.dot.e{background:#94a3b8}
+.q-row{display:flex;align-items:flex-start;gap:10px;padding:.85rem 0;border-bottom:1px solid #f0f0ee}
+.q-row:last-child{border-bottom:none}
+.notice{background:#fffbeb;border:1px solid #f59e0b;border-radius:8px;padding:.85rem 1rem;font-size:13px;color:#92400e;margin-bottom:1rem}
+/* Essay marking */
+.essay-marking{background:#f0f7ff;border:1px solid #bdd7f7;border-radius:10px;padding:1rem;margin-top:.75rem}
+.mark-input{width:72px!important;font-size:18px!important;font-weight:700;text-align:center;border-color:#bdd7f7!important}
+.mark-input:focus{border-color:#1a56db!important}
+.mark-feedback{font-size:12px;padding:3px 10px;border-radius:999px;font-weight:600;display:none;margin-left:4px}
+.mark-feedback.show{display:inline-block}
+.mark-feedback.ok{background:#e8f5e9;color:#2e7d32}
+.mark-feedback.over{background:#fef2f2;color:#b91c1c}
+/* Sticky score bar */
+.score-bar{display:none;position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #e8e8e4;padding:.65rem 0;margin-bottom:1rem}
+.score-bar.show{display:block}
+.score-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:999px;font-size:13px;font-weight:700;background:#1a1a1a;color:#fff}
+/* Password overlay */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}
+.overlay.show{display:flex}
+.modal{background:#fff;border-radius:16px;padding:2rem;width:90%;max-width:360px}
+.modal-err{font-size:13px;color:#b91c1c;margin-top:.5rem;min-height:20px}
+.shake{animation:shake .35s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+</style>
+</head>
+<body>
+
+<!-- PASSWORD OVERLAY -->
+<div class="overlay" id="pwOverlay">
+  <div class="modal" id="pwModal">
+    <h3 style="margin-bottom:.4rem">Teacher access</h3>
+    <p class="sub" style="margin-bottom:1.25rem">Enter the teacher password to continue.</p>
+    <input type="password" id="pwInput" placeholder="Password" onkeydown="if(event.key==='Enter')checkTeacherPw()">
+    <div class="modal-err" id="pwErr"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1rem">
+      <button class="btn" onclick="closePwOverlay()">Cancel</button>
+      <button class="btn primary" onclick="checkTeacherPw()">Enter</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ── LANDING — students only see this ── -->
+<div id="s-landing" class="screen active">
+  <div style="text-align:center;padding:3rem 1rem 2rem">
+    <div style="font-size:40px;margin-bottom:1rem">📋</div>
+    <h1 style="margin-bottom:.5rem">Nutrition &amp; Health Exam</h1>
+    <p class="sub" style="max-width:420px;margin:0 auto 2rem">20 MCQ questions + 4 structured essay questions &nbsp;·&nbsp; Total: 40 marks</p>
+    <button class="btn primary" style="font-size:16px;padding:12px 32px" onclick="showScreen('s-student-start')">Start exam</button>
+  </div>
+  <!-- Secret teacher trigger: tap bottom-right corner 5 times -->
+  <div onclick="teacherTap()" style="position:fixed;bottom:0;right:0;width:64px;height:64px;z-index:10;opacity:0;cursor:default"></div>
+</div>
+
+<!-- ── TEACHER PANEL ── -->
+<div id="s-teacher" class="screen">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.5rem">
+    <button class="btn" onclick="showScreen('s-landing')" style="padding:6px 12px">← Back</button>
+    <h2 style="margin:0">Teacher panel</h2>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:.75rem">Set time limit</h3>
+    <span class="label">Duration in minutes (leave blank for no timer)</span>
+    <input type="number" id="timeLimit" placeholder="e.g. 60" min="1" max="300" style="width:160px;margin-bottom:12px">
+    <br>
+    <button class="btn primary" onclick="showExamCode()">Generate exam code</button>
+  </div>
+  <div id="examCodeArea" style="display:none">
+    <div class="card" style="border-color:#a5d6a7">
+      <h3 style="color:#2e7d32;margin-bottom:.5rem">✓ Exam code ready</h3>
+      <p class="sub" style="font-size:13px">Share this code with your students. They enter it on the student page to start the exam.</p>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:.75rem;flex-wrap:wrap">
+        <div style="font-size:40px;font-weight:700;letter-spacing:6px;font-family:monospace" id="examCodeDisplay">——</div>
+        <button class="btn" onclick="copyText(document.getElementById('examCodeDisplay').textContent,this)">Copy code</button>
+      </div>
+      <p class="sub" style="font-size:12px;margin:0">Students: open the exam page → enter name + this code → start.</p>
+    </div>
+    <div class="card" style="border-color:#f59e0b">
+      <h3 style="color:#92400e;margin-bottom:.4rem">Your teacher password</h3>
+      <p class="sub" style="font-size:13px;margin-bottom:.75rem">This is the password you set in the file. Keep it private — you need it to access this panel and to review submissions.</p>
+      <div style="font-size:13px;color:#92400e;background:#fffbeb;border-radius:8px;padding:8px 12px;font-family:monospace;font-weight:700" id="teacherPwHint">TeacherOnly2025</div>
+      <p class="sub" style="font-size:12px;margin-top:6px">You can change this password by editing the HTML file — look for <code>TEACHER_PASSWORD</code>.</p>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:.5rem">Review student submissions</h3>
+      <p class="sub" style="font-size:13px;margin-bottom:.75rem">Paste a student's submission block to see MCQ scores and enter essay marks.</p>
+      <button class="btn" onclick="showScreen('s-teacher-review')">Open review panel →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── STUDENT START ── -->
+<div id="s-student-start" class="screen">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.5rem">
+    <button class="btn" onclick="showScreen('s-landing')" style="padding:6px 12px">← Back</button>
+    <h2 style="margin:0">Start exam</h2>
+  </div>
+  <div class="card">
+    <span class="label">Your full name</span>
+    <input type="text" id="studentName" placeholder="Enter your full name" style="margin-bottom:12px">
+    <span class="label">Exam code (given by your teacher)</span>
+    <input type="text" id="examCodeInput" placeholder="e.g. A3K7NP" style="margin-bottom:16px;letter-spacing:4px;font-family:monospace;font-size:20px;text-transform:uppercase" maxlength="6" oninput="this.value=this.value.toUpperCase()">
+    <button class="btn primary" style="width:100%;justify-content:center;padding:12px" onclick="startStudentExam()">Start exam →</button>
+  </div>
+</div>
+
+<!-- ── STUDENT EXAM ── -->
+<div id="s-exam" class="screen">
+  <div class="flex-between" style="margin-bottom:.75rem">
+    <div>
+      <div style="font-size:15px;font-weight:600">Nutrition &amp; Health Exam</div>
+      <div style="font-size:13px;color:#888" id="stu-nameDisplay"></div>
+    </div>
+    <div id="timerDisplay"></div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <div id="questionsContainer"></div>
+  <hr class="divider">
+  <div class="flex-end">
+    <button class="btn primary" style="padding:10px 28px" onclick="submitExam(false)">Submit exam</button>
+  </div>
+</div>
+
+<!-- ── SUBMITTED ── -->
+<div id="s-submitted" class="screen">
+  <div style="text-align:center;padding:1.5rem 0 1rem">
+    <div style="font-size:40px;margin-bottom:.5rem">✅</div>
+    <h2>Exam submitted!</h2>
+    <p class="sub">Copy the full block below and send it to your teacher via WhatsApp or email.</p>
+  </div>
+  <div class="card">
+    <div class="flex-between" style="margin-bottom:10px">
+      <span class="label" style="margin:0">Your submission — send this entire block to your teacher</span>
+      <button class="btn" onclick="copyBox('submittedCode',this)" style="padding:5px 14px;font-size:13px">Copy</button>
+    </div>
+    <div id="submittedCode" style="font-size:11.5px;line-height:1.7;white-space:pre-wrap;font-family:monospace;background:#f5f5f3;padding:12px;border-radius:8px;max-height:280px;overflow-y:auto;border:1px solid #e8e8e4"></div>
+  </div>
+  <div class="notice">⚠ Do not close this page until you have sent the code to your teacher.</div>
+</div>
+
+<!-- ── TEACHER REVIEW ── -->
+<div id="s-teacher-review" class="screen">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.5rem">
+    <button class="btn" onclick="showScreen('s-teacher')" style="padding:6px 12px">← Back</button>
+    <h2 style="margin:0">Review &amp; mark submission</h2>
+  </div>
+
+  <!-- Sticky score bar -->
+  <div id="scoreBar" class="score-bar">
+    <div class="flex-between">
+      <span style="font-size:14px;font-weight:600" id="barStudentName">—</span>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <span style="font-size:13px;color:#666">MCQ: <strong id="barMCQ">—</strong></span>
+        <span style="font-size:13px;color:#666">Essay: <strong id="barEssay">—</strong></span>
+        <span class="score-pill">Total: <span id="barTotal">—</span>/40</span>
+        <button class="btn green" style="padding:5px 14px;font-size:13px" onclick="copyScoreSummary(event)">Copy score</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="pasteCard">
+    <h3 style="margin-bottom:.5rem">Paste student submission</h3>
+    <p class="sub" style="font-size:13px">Paste the full block the student sent you, including the ---BEGIN--- and ---END--- lines.</p>
+    <textarea id="teacherPasteBox" placeholder="Paste submission here..." style="min-height:110px;margin-bottom:12px"></textarea>
+    <button class="btn primary" onclick="gradeSubmission()">Load &amp; mark →</button>
+  </div>
+
+  <div id="gradeResults" style="display:none">
+    <div class="grid" id="scoreMetrics"></div>
+    <div class="card" id="scoreBreakdown"></div>
+    <div class="flex-end" style="margin-top:.5rem;gap:8px">
+      <button class="btn green" onclick="copyScoreSummary(event)">Copy score summary</button>
+      <button class="btn" onclick="resetReview()">Review another student</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- end .wrap -->
+<script>
+// ─── CONFIGURATION ───────────────────────────────────────
+// Change this to your own password before uploading to GitHub
+const TEACHER_PASSWORD = "TeacherOnly2025";
+// ─────────────────────────────────────────────────────────
+
+const MCQ=[
+  {id:1,text:"Which of the following is classified as a macronutrient?",options:["Vitamin C","Iron","Protein","Calcium"],correct:2,marks:1},
+  {id:2,text:"Which macronutrient provides the highest amount of energy per gram?",options:["Carbohydrate","Protein","Fat","Water"],correct:2,marks:1},
+  {id:3,text:"What is the main function of carbohydrates in the body?",options:["Build antibodies","Provide energy","Regulate blood clotting","Strengthen bones"],correct:1,marks:1},
+  {id:4,text:"Which condition may occur due to severe protein deficiency?",options:["Rickets","Night blindness","Kwashiorkor","Scurvy"],correct:2,marks:1},
+  {id:5,text:"Which vitamin is important for vision and maintenance of epithelial tissue?",options:["Vitamin A","Vitamin C","Vitamin D","Vitamin K"],correct:0,marks:1},
+  {id:6,text:"Which vitamin deficiency causes rickets in children?",options:["Vitamin A","Vitamin D","Vitamin E","Vitamin K"],correct:1,marks:1},
+  {id:7,text:"Which mineral is mainly responsible for oxygen transport in blood?",options:["Zinc","Calcium","Iron","Sodium"],correct:2,marks:1},
+  {id:8,text:"Why is water important for the body?",options:["Produces hormones","Supplies calories","Maintains hydration and transports nutrients","Increases cholesterol levels"],correct:2,marks:1},
+  {id:9,text:"When does energy balance occur?",options:["Energy intake is less than energy expenditure","Energy intake equals energy expenditure","Energy intake is greater than expenditure","Fat intake exceeds carbohydrate intake"],correct:1,marks:1},
+  {id:10,text:"What is ATP mainly used for in the body?",options:["Storing vitamins","Transporting oxygen","Providing cellular energy","Digesting proteins"],correct:2,marks:1},
+  {id:11,text:"Which process breaks down glucose to produce energy?",options:["Photosynthesis","Glycolysis","Osmosis","Filtration"],correct:1,marks:1},
+  {id:12,text:"Which nutrient is especially important for collagen formation and skin health?",options:["Vitamin C","Vitamin D","Vitamin K","Sodium"],correct:0,marks:1},
+  {id:13,text:"What are the characteristics of a healthy diet?",options:["High in fast food","Balanced and varied","Rich in sugar only","Low in all fats"],correct:1,marks:1},
+  {id:14,text:"Which of the following is considered a healthy fat source?",options:["Fried chicken skin","Processed sausage","Fish and nuts","Sugary beverages"],correct:2,marks:1},
+  {id:15,text:"What is the aim of primary prevention?",options:["Rehabilitate disabled patients","Detect disease early","Prevent disease before it occurs","Prevent unnecessary treatment"],correct:2,marks:1},
+  {id:16,text:"Which stage of the natural history of disease shows signs and symptoms?",options:["Susceptibility stage","Subclinical stage","Clinical disease stage","Recovery stage"],correct:2,marks:1},
+  {id:17,text:"Which of the following is an example of biological food contamination?",options:["Hair in food","Pesticides in vegetables","Salmonella in chicken","Metal fragments in canned food"],correct:2,marks:1},
+  {id:18,text:"When does cross-contamination commonly occur?",options:["Food is refrigerated properly","Raw meat touches cooked food","Food is cooked thoroughly","Hands are washed regularly"],correct:1,marks:1},
+  {id:19,text:"What is HACCP mainly used for?",options:["Increase food flavor","Control food safety hazards","Promote weight loss","Measure body temperature"],correct:1,marks:1},
+  {id:20,text:"Which practice is part of good food hygiene?",options:["Handling food while sick","Using dirty utensils","Washing hands before food preparation","Leaving cooked food uncovered"],correct:2,marks:1}
+];
+
+const ESSAYS=[
+  {id:21,text:"Question 1 (5 marks)\n\nExcessive intake of carbohydrate-rich foods together with low physical activity may contribute to weight gain and obesity.\n\na) State TWO functions of carbohydrates in the body. (2 marks)\nb) Define energy balance. (1 mark)\nc) Explain ONE effect of positive energy balance on health. (2 marks)",marks:5},
+  {id:22,text:"Question 2 (5 marks)\n\nDeficiency of micronutrients and inadequate water intake may affect normal body functions and overall health.\n\na) Name TWO fat-soluble vitamins. (2 marks)\nb) State ONE function of water in maintaining health. (1 mark)\nc) Give TWO characteristics of a healthy diet. (2 marks)",marks:5},
+  {id:23,text:"Question 3 (5 marks)\n\nHealth promotion activities help reduce the occurrence of diseases and improve the quality of life in the community.\n\na) Define health promotion. (2 marks)\nb) Differentiate between primary prevention and secondary prevention with ONE example each. (3 marks)",marks:5},
+  {id:24,text:"Question 4 (5 marks)\n\nImproper food handling and contamination may increase the risk of foodborne diseases and food allergies.\n\na) List TWO types of food contamination. (2 marks)\nb) State ONE symptom of food allergy. (1 mark)\nc) Describe TWO food hygiene practices that can prevent foodborne disease. (2 marks)",marks:5}
+];
+
+// ─── STATE ───────────────────────────────────────────────
+let studentAnswers={};
+let timerInterval=null;
+let secondsLeft=0;
+let tapCount=0,tapTimer=null;
+let pendingScreen='s-teacher';
+let currentSubmission=null;
+let essayMarks={};
+let _mcqMarks=0;
+
+// ─── SCREEN ──────────────────────────────────────────────
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ─── PASSWORD ────────────────────────────────────────────
+function teacherTap(){
+  tapCount++;
+  clearTimeout(tapTimer);
+  if(tapCount>=5){tapCount=0;openPwOverlay('s-teacher');}
+  else tapTimer=setTimeout(()=>tapCount=0,2500);
+}
+
+function openPwOverlay(target){
+  pendingScreen=target||'s-teacher';
+  document.getElementById('pwInput').value='';
+  document.getElementById('pwErr').textContent='';
+  document.getElementById('pwOverlay').classList.add('show');
+  setTimeout(()=>document.getElementById('pwInput').focus(),80);
+}
+
+function closePwOverlay(){
+  document.getElementById('pwOverlay').classList.remove('show');
+}
+
+function checkTeacherPw(){
+  if(document.getElementById('pwInput').value===TEACHER_PASSWORD){
+    closePwOverlay();
+    showScreen(pendingScreen);
+  } else {
+    document.getElementById('pwErr').textContent='Incorrect password. Please try again.';
+    const m=document.getElementById('pwModal');
+    m.classList.remove('shake');void m.offsetWidth;m.classList.add('shake');
+    document.getElementById('pwInput').value='';
+    document.getElementById('pwInput').focus();
+  }
+}
+
+window.addEventListener('load',()=>{
+  if(new URLSearchParams(window.location.search).has('teacher'))openPwOverlay('s-teacher');
+});
+
+// ─── TEACHER ─────────────────────────────────────────────
+function showExamCode(){
+  const tl=document.getElementById('timeLimit').value.trim();
+  sessionStorage.setItem('examTL',tl&&parseInt(tl)>0?parseInt(tl):'');
+  const code=randCode(6);
+  sessionStorage.setItem('examCode',code);
+  document.getElementById('examCodeDisplay').textContent=code;
+  document.getElementById('teacherPwHint').textContent=TEACHER_PASSWORD;
+  document.getElementById('examCodeArea').style.display='block';
+}
+
+function randCode(n){
+  const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let r='';for(let i=0;i<n;i++)r+=c[Math.floor(Math.random()*c.length)];return r;
+}
+
+// ─── STUDENT START ────────────────────────────────────────
+function startStudentExam(){
+  const name=document.getElementById('studentName').value.trim();
+  const code=document.getElementById('examCodeInput').value.trim().toUpperCase();
+  if(!name){alert('Please enter your full name.');return;}
+  if(code.length<4){alert('Please enter the exam code from your teacher.');return;}
+  const saved=sessionStorage.getItem('examCode');
+  if(saved&&code!==saved){alert('Incorrect exam code. Please check with your teacher.');return;}
+  studentAnswers={};
+  document.getElementById('stu-nameDisplay').textContent=name;
+  renderStudentQuestions();
+  showScreen('s-exam');
+  const tl=sessionStorage.getItem('examTL');
+  if(tl&&parseInt(tl)>0){secondsLeft=parseInt(tl)*60;startTimer();}
+  else document.getElementById('timerDisplay').innerHTML='';
+}
+
+// ─── TIMER ───────────────────────────────────────────────
+function startTimer(){
+  updateTimerDisplay();
+  timerInterval=setInterval(()=>{secondsLeft--;updateTimerDisplay();if(secondsLeft<=0){clearInterval(timerInterval);submitExam(true);}},1000);
+}
+function updateTimerDisplay(){
+  const m=Math.floor(secondsLeft/60),s=secondsLeft%60;
+  const str=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  let cls='timer-box';
+  if(secondsLeft<=60)cls+=' danger';else if(secondsLeft<=300)cls+=' warn';
+  document.getElementById('timerDisplay').innerHTML=`<div class="${cls}">⏱ ${str}</div>`;
+}
+
+// ─── RENDER QUESTIONS ────────────────────────────────────
+function renderStudentQuestions(){
+  const c=document.getElementById('questionsContainer');
+  let html='<div class="section-hd">Section A — Multiple Choice &nbsp;(20 × 1 mark = 20 marks)</div>';
+  html+=MCQ.map((q,i)=>`
+    <div class="card" style="margin-bottom:.75rem">
+      <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
+        <span class="q-num">${i+1}</span>
+        <div style="flex:1">
+          <div style="display:flex;gap:6px;margin-bottom:6px"><span class="badge mcq">MCQ</span><span style="font-size:12px;color:#888">1 mark</span></div>
+          <p style="font-size:15px;line-height:1.6">${escHtml(q.text)}</p>
+        </div>
+      </div>
+      ${q.options.map((opt,oi)=>`
+        <div class="mcq-option" id="sopt-${q.id}-${oi}" onclick="selectMCQ(${q.id},${oi},${q.options.length})">
+          <input type="radio" name="sq${q.id}" style="pointer-events:none;flex-shrink:0;accent-color:#1a56db">
+          <span class="opt-letter" style="font-size:14px;font-weight:600;min-width:20px;flex-shrink:0">${String.fromCharCode(65+oi)}.</span>
+          <span style="font-size:14px">${escHtml(opt)}</span>
+        </div>`).join('')}
+    </div>`).join('');
+
+  html+='<div class="section-hd" style="margin-top:1.5rem">Section B — Structured Essay &nbsp;(4 × 5 marks = 20 marks)</div>';
+  html+=ESSAYS.map((q,ei)=>`
+    <div class="card" style="margin-bottom:.75rem">
+      <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
+        <span class="q-num">${20+ei+1}</span>
+        <div style="flex:1">
+          <span class="badge essay" style="margin-bottom:8px;display:inline-block">Essay · 5 marks</span>
+          <p style="font-size:14px;line-height:1.9;white-space:pre-wrap">${escHtml(q.text)}</p>
+        </div>
+      </div>
+      <textarea placeholder="Write your answer here..." oninput="recordEssay(${q.id},this.value)" style="width:100%;min-height:130px"></textarea>
+    </div>`).join('');
+  c.innerHTML=html;
+  updateProgress();
+}
+
+function selectMCQ(qid,oi,total){
+  for(let i=0;i<total;i++){const el=document.getElementById(`sopt-${qid}-${i}`);if(el){el.classList.remove('selected');el.querySelector('input').checked=false;}}
+  const el=document.getElementById(`sopt-${qid}-${oi}`);
+  if(el){el.classList.add('selected');el.querySelector('input').checked=true;}
+  studentAnswers[qid]={type:'mcq',optionIndex:oi};
+  updateProgress();
+}
+
+function recordEssay(qid,val){studentAnswers[qid]={type:'essay',text:val};updateProgress();}
+
+function updateProgress(){
+  const total=MCQ.length+ESSAYS.length;
+  const ans=MCQ.filter(q=>{const a=studentAnswers[q.id];return a&&a.type==='mcq';}).length
+    +ESSAYS.filter(q=>{const a=studentAnswers[q.id];return a&&a.type==='essay'&&a.text&&a.text.trim();}).length;
+  document.getElementById('progressFill').style.width=Math.round((ans/total)*100)+'%';
+}
+
+// ─── SUBMIT ──────────────────────────────────────────────
+function submitExam(auto){
+  if(timerInterval)clearInterval(timerInterval);
+  const name=document.getElementById('studentName').value.trim();
+  const unanswered=[...MCQ,...ESSAYS].filter(q=>{const a=studentAnswers[q.id];return!a||(a.type==='essay'&&(!a.text||!a.text.trim()));});
+  if(!auto&&unanswered.length>0&&!confirm(`${unanswered.length} question(s) unanswered. Submit anyway?`))return;
+  const now=new Date().toLocaleString();
+  const ansArr=[...MCQ,...ESSAYS].map(q=>{
+    const a=studentAnswers[q.id];
+    return{qid:q.id,type:q.correct!==undefined?'mcq':'essay',oi:a&&a.type==='mcq'?a.optionIndex:null,et:a&&a.type==='essay'?a.text:null};
+  });
+  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify({n:name,t:now,a:ansArr}))));
+  document.getElementById('submittedCode').textContent=`STUDENT: ${name}\nSUBMITTED: ${now}\n\n---BEGIN SUBMISSION---\n${encoded}\n---END SUBMISSION---`;
+  showScreen('s-submitted');
+}
+
+// ─── GRADE ───────────────────────────────────────────────
+function gradeSubmission(){
+  const raw=document.getElementById('teacherPasteBox').value.trim();
+  const match=raw.match(/---BEGIN SUBMISSION---([\s\S]+?)---END SUBMISSION---/);
+  if(!match){alert('Could not find submission block. Paste the full text including the ---BEGIN--- and ---END--- lines.');return;}
+  let sub;
+  try{sub=JSON.parse(decodeURIComponent(escape(atob(match[1].trim()))));}
+  catch(e){alert('Invalid submission code.');return;}
+
+  currentSubmission=sub;
+  essayMarks={};
+
+  let mcqCorrect=0;_mcqMarks=0;
+  const mcqR=MCQ.map(q=>{
+    const ans=sub.a.find(a=>a.qid===q.id);
+    const ok=ans&&ans.oi===q.correct;
+    if(ok){mcqCorrect++;_mcqMarks+=q.marks;}
+    return{...q,isCorrect:ok,answered:ans?ans.oi:null};
+  });
+  const essayR=ESSAYS.map(q=>{
+    const ans=sub.a.find(a=>a.qid===q.id);
+    return{...q,text:ans?ans.et:''};
+  });
+
+  // Score bar
+  document.getElementById('barStudentName').textContent=sub.n;
+  document.getElementById('barMCQ').textContent=_mcqMarks+'/20';
+  document.getElementById('barEssay').textContent='0/20';
+  document.getElementById('barTotal').textContent=_mcqMarks;
+  document.getElementById('scoreBar').classList.add('show');
+
+  // Metric cards
+  document.getElementById('scoreMetrics').innerHTML=`
+    <div class="metric"><span class="lbl">Student</span><span class="val" style="font-size:15px">${escHtml(sub.n)}</span></div>
+    <div class="metric"><span class="lbl">Submitted</span><span class="val" style="font-size:12px">${escHtml(sub.t)}</span></div>
+    <div class="metric"><span class="lbl">MCQ correct</span><span class="val">${mcqCorrect}/20</span></div>
+    <div class="metric"><span class="lbl">MCQ marks</span><span class="val" id="metaMCQ">${_mcqMarks}/20</span></div>
+    <div class="metric"><span class="lbl">Essay marks</span><span class="val" id="metaEssay">0/20</span></div>
+    <div class="metric" style="background:#1a1a1a;color:#fff"><span class="lbl" style="color:#999">Total</span><span class="val" id="metaTotal">${_mcqMarks}/40</span></div>
+  `;
+
+  // Breakdown
+  let html='<h3 style="margin-bottom:1rem">MCQ breakdown</h3>';
+  html+=mcqR.map((b,i)=>{
+    const aL=b.answered!==null?String.fromCharCode(65+b.answered):'—';
+    const cL=String.fromCharCode(65+b.correct);
+    return`<div class="q-row">
+      <div class="dot ${b.isCorrect?'c':'w'}"></div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;margin-bottom:2px">Q${i+1} &nbsp;·&nbsp; <span style="color:${b.isCorrect?'#16a34a':'#dc2626'}">${b.isCorrect?'✓ Correct':'✗ Wrong'}</span></div>
+        <div style="font-size:13px;color:#444;margin-bottom:2px">${escHtml(b.text)}</div>
+        <div style="font-size:12px;color:#888">Student answered: <strong>${aL}</strong> &nbsp;·&nbsp; Correct: <strong>${cL}. ${escHtml(b.options[b.correct])}</strong></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  html+=`<div style="margin-top:1.75rem;margin-bottom:.25rem">
+    <h3>Essay marking</h3>
+    <p class="sub" style="font-size:13px;margin-top:4px">Read each answer below and enter the marks. The total score updates automatically.</p>
+  </div>`;
+
+  html+=essayR.map((b,ei)=>`
+    <div class="q-row" style="flex-direction:column;align-items:stretch">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:.6rem;flex-wrap:wrap">
+        <div class="dot e"></div>
+        <span style="font-size:14px;font-weight:600">Essay Q${ei+1}</span>
+        <span class="badge essay">Max ${b.marks} marks</span>
+      </div>
+      <div style="font-size:12px;color:#777;white-space:pre-wrap;line-height:1.7;margin-bottom:.5rem">${escHtml(b.text)}</div>
+      <div style="font-size:14px;color:#222;background:#f5f5f3;padding:12px;border-radius:8px;line-height:1.8;white-space:pre-wrap;border:1px solid #e8e8e4;min-height:52px">${b.text?escHtml(b.text):'<em style="opacity:.4;font-size:13px">No answer provided</em>'}</div>
+      <div class="essay-marking">
+        <div style="font-size:13px;font-weight:600;color:#1a56db;margin-bottom:.65rem">Enter marks for this question</div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <label style="font-size:13px;color:#444;font-weight:500">Marks:</label>
+          <input type="number" class="mark-input" id="em-${b.id}" min="0" max="${b.marks}" step="0.5" placeholder="0"
+            oninput="updateEssayMark(${b.id},${b.marks},this)"
+            style="width:72px;font-size:18px;font-weight:700;text-align:center">
+          <span style="font-size:13px;color:#666">/ ${b.marks}</span>
+          <span class="mark-feedback" id="emfb-${b.id}"></span>
+        </div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('scoreBreakdown').innerHTML=html;
+  document.getElementById('pasteCard').style.display='none';
+  document.getElementById('gradeResults').style.display='block';
+}
+
+function updateEssayMark(qid,max,input){
+  const fb=document.getElementById('emfb-'+qid);
+  let v=parseFloat(input.value);
+  if(isNaN(v)||input.value===''){
+    essayMarks[qid]=0;fb.className='mark-feedback';fb.textContent='';
+  } else if(v<0){
+    input.value=0;essayMarks[qid]=0;
+  } else if(v>max){
+    fb.className='mark-feedback over show';fb.textContent='Max is '+max;essayMarks[qid]=v;
+  } else {
+    essayMarks[qid]=v;
+    fb.className='mark-feedback ok show';fb.textContent='✓';
+    setTimeout(()=>{if(fb)fb.className='mark-feedback';},1400);
+  }
+  refreshTotals();
+}
+
+function refreshTotals(){
+  const et=Object.values(essayMarks).reduce((s,v)=>s+(v||0),0);
+  const grand=_mcqMarks+et;
+  const fmt=n=>Number.isInteger(n)?n:n.toFixed(1);
+  document.getElementById('metaEssay').textContent=fmt(et)+'/20';
+  document.getElementById('metaTotal').textContent=fmt(grand)+'/40';
+  document.getElementById('barEssay').textContent=fmt(et)+'/20';
+  document.getElementById('barTotal').textContent=fmt(grand);
+}
+
+function copyScoreSummary(e){
+  if(!currentSubmission)return;
+  const et=Object.values(essayMarks).reduce((s,v)=>s+(v||0),0);
+  const grand=_mcqMarks+et;
+  const fmt=n=>Number.isInteger(n)?n:n.toFixed(1);
+  const eLines=ESSAYS.map((q,i)=>`  Essay Q${i+1}: ${essayMarks[q.id]!==undefined?fmt(essayMarks[q.id]):'(not marked)'} / ${q.marks}`).join('\n');
+  const txt=`EXAM SCORE SUMMARY\n${'─'.repeat(38)}\nStudent  : ${currentSubmission.n}\nDate     : ${currentSubmission.t}\n${'─'.repeat(38)}\nSection A (MCQ)   : ${_mcqMarks} / 20\nSection B (Essay) : ${fmt(et)} / 20\n${eLines}\n${'─'.repeat(38)}\nTOTAL             : ${fmt(grand)} / 40\n${'─'.repeat(38)}`;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn=e.target;const o=btn.textContent;btn.textContent='Copied!';setTimeout(()=>btn.textContent=o,2000);
+  });
+}
+
+function resetReview(){
+  currentSubmission=null;essayMarks={};_mcqMarks=0;
+  document.getElementById('teacherPasteBox').value='';
+  document.getElementById('gradeResults').style.display='none';
+  document.getElementById('pasteCard').style.display='block';
+  document.getElementById('scoreBar').classList.remove('show');
+}
+
+// ─── UTILS ───────────────────────────────────────────────
+function copyText(txt,btn){navigator.clipboard.writeText(txt).then(()=>{const o=btn.textContent;btn.textContent='Copied!';setTimeout(()=>btn.textContent=o,2000);});}
+function copyBox(id,btn){copyText(document.getElementById(id).textContent,btn);}
+function escHtml(s){if(!s)return'';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>
